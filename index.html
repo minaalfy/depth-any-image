@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en" class="antialiased" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Animated 3D images</title>
+    <meta name="description" content="Generate Depth image and 3D animated canvas for any image" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="mask-icon" href="/favicon/mask-icon.svg" color="#5bbad5">
+    <link rel="shortcut icon" href="/favicon/favicon.ico" />
+    <meta name="msapplication-config" content="/favicon/browserconfig.xml" />
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+  </head>
+  <body
+    class="bg-gradient-to-r from-orange-400 to-purple-600 dark:from-orange-950 dark:to-purple-950 font-sans m-0 p-0 min-h-[100vh]"
+    x-data="generator"
+  >
+    <div class="flex flex-col min-h-[100vh]">
+      <header class="px-4 lg:px-6 pt-12">
+        <div class="max-w-screen-xl mb-4 mx-auto flex flex-col items-center text-center" x-ignore>
+          <h1 class="font-medium mb-4 text-4xl">Animated 3D Hero image</h1>
+          <h2 class="font-medium text-2xl m-0">
+            Generate depth map for any image using
+            <a href="https://github.com/DepthAnything/Depth-Anything-V2?tab=readme-ov-file" target="_blank"
+              >Depth Anything V2 Model</a
+            >
+            then create 3D effect for it.
+          </h2>
+          <a
+            href="https://github.com/minaalfy/skeleton-loader"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="p-5 bg-purple-50 bg-opacity-20 rounded-md my-4"
+          >
+            <span class="align-top inline-flex flex-row items-center"
+              ><svg fill="currentColor" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5">
+                <path
+                  d="M7.975 16a9.39 9.39 0 003.169-.509c-.473.076-.652-.229-.652-.486l.004-.572c.003-.521.01-1.3.01-2.197 0-.944-.316-1.549-.68-1.863 2.24-.252 4.594-1.108 4.594-4.973 0-1.108-.39-2.002-1.032-2.707.1-.251.453-1.284-.1-2.668 0 0-.844-.277-2.77 1.032A9.345 9.345 0 008 .717c-.856 0-1.712.113-2.518.34C3.556-.24 2.712.025 2.712.025c-.553 1.384-.2 2.417-.1 2.668-.642.705-1.033 1.612-1.033 2.707 0 3.852 2.342 4.72 4.583 4.973-.29.252-.554.692-.642 1.347-.58.264-2.027.692-2.933-.831-.19-.302-.756-1.045-1.549-1.032-.843.012-.34.478.013.667.428.239.919 1.133 1.032 1.422.201.567.856 1.65 3.386 1.184 0 .55.006 1.079.01 1.447l.003.428c0 .265-.189.567-.692.479 1.007.34 1.926.516 3.185.516z"
+                ></path></svg
+              ><span style="width: 0.67ch"></span>Open in GitHub</span
+            >
+          </a>
+        </div>
+        <button
+          type="button"
+          aria-label="Toggle theme color"
+          x-cloak
+          class="z-10 btn btn-primary fixed right-2 top-2"
+          @click="toggleTheme"
+        >
+          <svg
+            class="w-5 h-5"
+            aria-hidden="true"
+            width="20"
+            :class="theme !== 'dark' || 'hidden'"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+          </svg>
+          <svg
+            class="w-5 h-5"
+            aria-hidden="true"
+            :class="theme === 'dark' || 'hidden'"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+            ></path>
+          </svg>
+        </button>
+      </header>
+      <main class="container flex-1 px-4 max-w-8xl mx-auto pb-4">
+        <div class="flex flex-col w-full lg:flex-row justify-center h-full">
+          <div class="card glass min-w-[30%] rounded-2xl p-4 h-full flex flex-col">
+            <label class="form-control w-full mb-4 mt-0">
+              <div class="label pt-0">
+                <span>Pick an Image to start</span>
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                :disabled="loadingMoel || uploading"
+                id="file-upload"
+                @change="handleFileSelect"
+                class="file-input w-full text-gray-900 dark:text-white"
+              />
+            </label>
+            <ul class="menu bg-gray-100 dark:bg-gray-800 rounded-box">
+              <li class="flex flex-row items-center text-lg text-gray-900 dark:text-white">
+                <span class="loading loading-spinner loading-xs p-0 text-success mr-2" x-show="loadingMoel"></span
+                ><input
+                  type="checkbox"
+                  checked
+                  readonly
+                  class="checkbox checkbox-xs checkbox-success p-0 mr-1"
+                  x-show="!!depth_estimator"
+                />
+                AI Model ready
+              </li>
+              <li
+                class="flex flex-row items-center"
+                :class="imageUrl ? 'text-lg text-gray-900 dark:text-white' : 'text-gray-400'"
+              >
+                <span class="loading loading-spinner loading-xs p-0 text-success mr-2" x-show="loadingImage"></span
+                ><input
+                  type="checkbox"
+                  :checked="imageUrl"
+                  :class="imageUrl ? 'checkbox-success' : ''"
+                  readonly
+                  class="checkbox checkbox-xs p-0 mr-1"
+                  x-show="!loadingImage"
+                />
+                Reading image
+              </li>
+              <li
+                class="flex flex-row items-center"
+                :class="depthMapUrl ? 'text-lg text-gray-900 dark:text-white' : 'text-gray-400'"
+              >
+                <span class="loading loading-spinner loading-xs p-0 text-success mr-2" x-show="loadingDepthMap"></span
+                ><input
+                  type="checkbox"
+                  :checked="depthMapUrl"
+                  :class="depthMapUrl ? 'checkbox-success' : ''"
+                  readonly
+                  class="checkbox checkbox-xs p-0 mr-1"
+                  x-show="!loadingDepthMap"
+                />
+                Generating depth map
+              </li>
+              <li
+                class="flex flex-row items-center"
+                :class="animatedImage ? 'text-lg text-gray-900 dark:text-white' : 'text-gray-400'"
+              >
+                <span
+                  class="loading loading-spinner loading-xs p-0 text-success mr-2"
+                  x-show="generatingAnimation"
+                ></span
+                ><input
+                  type="checkbox"
+                  :checked="animatedImage"
+                  :class="animatedImage ? 'checkbox-success' : ''"
+                  readonly
+                  class="checkbox checkbox-xs p-0 mr-1"
+                  x-show="!generatingAnimation"
+                />
+                Generating the animation
+              </li>
+            </ul>
+            <div class="flex gap-2">
+              <div class="card bg-base-100 max-w-52 mt-4" x-cloak x-show="imageUrl" x-transition>
+                <figure>
+                  <img
+                    :src="imageUrl"
+                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
+                    alt="Original"
+                  />
+                </figure>
+                <div class="card-body p-2 text-gray-500 dark:text-gray-100">
+                  <h5>Original image</h5>
+                </div>
+              </div>
+              <div class="card bg-base-100 max-w-52 mt-4" x-cloak x-show="depthMapUrl" x-transition>
+                <figure>
+                  <img
+                    :src="depthMapUrl"
+                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
+                    alt="Depth map"
+                  />
+                </figure>
+                <div class="card-body p-2 text-gray-500 dark:text-gray-100 flex-row justify-between">
+                  <h5>Depth map</h5>
+                  <a class="btn btn-primary btn-xs" :href="depthMapUrl" download="DepthMap.png">Download</a>
+                </div>
+              </div>
+            </div>
+            <form x-cloak x-show="animatedImage" x-transition>
+              <fieldset class="flex gap-3">
+                <div class="form-control flex-1">
+                  <label class="my-2 cursor-pointer" for="duration"
+                    >Vertical threshold (<span x-text="vtv"></span> )</label
+                  >
+                  <div>
+                    <input type="range" min="0" max="100" class="range range-xs" x-model.debounce="vtv" />
+                    <div class="w-full flex justify-between text-xs px-2"></div>
+                  </div>
+                </div>
+                <div class="form-control flex-1">
+                  <label class="my-2 cursor-pointer" for="duration"
+                    >Horizontal threshold (<span x-text="htv"></span> )</label
+                  >
+                  <div>
+                    <input type="range" min="0" max="100" class="range range-xs" x-model.debounce="htv" />
+                    <div class="w-full flex justify-between text-xs px-2"></div>
+                  </div>
+                </div>
+              </fieldset>
+            </form>
+          </div>
+          <div class="divider lg:divider-horizontal" x-show="animatedImage" x-transition x-cloak>
+            <svg
+              class="w-10 h-10 lg:-rotate-90 stroke-primary"
+              fill="none"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 13l-7 7-7-7m14-8l-7 7-7-7"
+              ></path>
+            </svg>
+          </div>
+          <div class="card bg-base-300 min-w-[70%]" x-show="animatedImage" x-transition x-cloak>
+            <div class="rounded-2xl bg-base-300 p-4 h-full flex flex-col">
+              <div class="flex-1 mb-4 min-h-[10rem]" id="gl"></div>
+              <div class="tabs tabs-lifted -mb-px" role="tablist">
+                <a href="#html-tab" role="tab" class="tab" @click="tab='HTML'" :class="tab==='HTML' && 'tab-active'"
+                  >HTML</a
+                >
+                <a href="#react-tab" role="tab" class="tab" @click="tab='React'" :class="tab==='React' && 'tab-active'"
+                  >React</a
+                >
+                <div class="tab mr-6 flex-1 cursor-default [--tab-border-color:transparent]"></div>
+              </div>
+              <div class="grid">
+                <div class="code-wrapper col-start-1 row-start-1 overflow-hidden relative">
+                  <div x-show="tab==='HTML'" id="html-tab">
+                    <pre
+                      class="max-h-[6rem] flex-1 overflow-auto rounded-b-lg"
+                    ><code class="language-html" x-text="htmlContent"></code></pre>
+                    <small class="text-base-content"
+                      >Make sure to include the JS file
+                      <a class="badge badge-sm badge-primary" href="image3d.umd.js" download="image3d.js">image3d.js</a>
+                      then the images
+                      <a
+                        class="badge badge-sm badge-primary"
+                        :href="imageUrl"
+                        :download="originalFilename"
+                        x-text="originalFilename"
+                      ></a>
+                      and
+                      <a
+                        class="badge badge-sm badge-primary"
+                        :href="depthMapUrl"
+                        :download="'depthMap-'+originalFilename"
+                        x-text="'depthMap-'+originalFilename"
+                      ></a>
+                      <br />
+                      make sure to pass right container id and that container to have a width and height.
+                      <br />
+                      And if you want to yse gyronorm make sure to include the
+                      <a href="/gyronorm.complete.js" download="gyronorm.js">gyronorm.js</a> script.
+                    </small>
+                  </div>
+                  <div x-show="tab==='React'" id="react-tab">
+                    <pre
+                      class="max-h-[6rem] flex-1 overflow-auto mb-4 rounded-b-lg"
+                    ><code class="language-jsx" x-text="reactContent">React code</code></pre>
+                    <small class="text-base-content"
+                      >Make sure to import the JS file
+                      <a class="badge badge-sm badge-primary" href="image3d.es.js" download="image3d.js">image3d.js</a>
+                      and in case you're using typescript then import from that file
+                      <a class="badge badge-sm badge-primary" href="image3d.ts" download="image3d.ts">image3d.ts</a>
+                      <br />
+                      Then the images
+                      <a
+                        class="badge badge-sm badge-primary"
+                        :href="imageUrl"
+                        :download="originalFilename"
+                        x-text="originalFilename"
+                      ></a>
+                      and
+                      <a
+                        class="badge badge-sm badge-primary"
+                        :href="depthMapUrl"
+                        :download="'depthMap-'+originalFilename"
+                        x-text="'depthMap-'+originalFilename"
+                      ></a>
+                      <br />
+                      Make sure to path right container id and that container to have a width and height.<br />
+                      And if you want to yse gyronorm make sure to install the
+                      <a href="https://github.com/dorukeker/gyronorm.js/" target="_blank">gyronorm.js</a> script before
+                      image3d.
+                    </small>
+                  </div>
+                </div>
+                <div class="col-start-1 row-start-1 flex items-start justify-end p-2">
+                  <div
+                    x-bind:data-tip="tab==='React' ? 'Copy React' : 'Copy HTML'"
+                    class="tooltip tooltip-left tooltip-accent"
+                  >
+                    <button
+                      class="btn btn-square btn-sm"
+                      aria-label="Copy Code"
+                      x-clipboard="tab==='React' ? htmlContent : htmlContent"
+                    >
+                      <svg class="w-5 h-5 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                        <path
+                          d="M 16 3 C 14.742188 3 13.847656 3.890625 13.40625 5 L 6 5 L 6 28 L 26 28 L 26 5 L 18.59375 5 C 18.152344 3.890625 17.257813 3 16 3 Z M 16 5 C 16.554688 5 17 5.445313 17 6 L 17 7 L 20 7 L 20 9 L 12 9 L 12 7 L 15 7 L 15 6 C 15 5.445313 15.445313 5 16 5 Z M 8 7 L 10 7 L 10 11 L 22 11 L 22 7 L 24 7 L 24 26 L 8 26 Z"
+                        ></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="/gyronorm.complete.js"></script>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

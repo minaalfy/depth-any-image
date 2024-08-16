@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.tab-active {
+  --tab-bg: hsl(0 0% 8%);
+  --tab-border-color: hsl(0 0% 8%);
+  color: #fff;
+}
