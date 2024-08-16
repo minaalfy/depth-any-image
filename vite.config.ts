@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  base: '/depth-any-image/',
   build: {
     outDir: './docs', // necessary for GitHub Pages
     emptyOutDir: true, // also necessary
